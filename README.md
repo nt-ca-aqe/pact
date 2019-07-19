@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/License-Apache%20License%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
-[![Build Status](https://travis-ci.org/nt-ca-aqe/pact.svg?branch=master)](https://travis-ci.org/nt-ca-aqe/pact)
+[![Build Status](https://circleci.com/gh/nt-ca-aqe/pact/tree/master.svg?style=svg)][1]
 
 # testIT | Pact Libraries
 
@@ -78,3 +78,5 @@ TestUtils is licensed under [The Apache License, Version 2.0](http://www.apache.
 The contents of this repository is mainly developed by
 [NovaTec Consulting GmbH](http://www.novatec-gmbh.de/),
 a German consultancy firm that drives quality in software development projects.
+
+[1]:https://circleci.com/gh/nt-ca-aqe/pact/tree/master
