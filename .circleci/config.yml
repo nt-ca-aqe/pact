@@ -1,0 +1,76 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/work
+    docker:
+      - image: caaqe/basic-build-environment
+    steps:
+      - checkout
+      - run: mvn --batch-mode verify
+
+  build-and-deploy-snapshot:
+    working_directory: ~/work
+    docker:
+      - image: caaqe/basic-build-environment
+    steps:
+      - checkout
+      - run:
+          name: Deploy Snapshot to Sonatype Nexus
+          command: >-
+            mvn --batch-mode deploy
+            -DskipTests=true
+            -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/content/repositories/snapshots
+            -Dossrh.username=$OSSRH_USERNAME
+            -Dossrh.password=$OSSRH_PASSWORD
+
+  build-and-deploy-release:
+    working_directory: ~/work
+    docker:
+      - image: caaqe/basic-build-environment
+    steps:
+      - checkout
+      - run:
+          name: Set Project Version
+          command: |
+            VERSION=$(echo $CIRCLE_TAG | cut -d 'v' -f 2)
+            mvn versions:set versions:commit -DnewVersion=$VERSION
+      - run:
+          name: Deploy Release to Sonatype Nexus
+          command: >-
+            mvn --batch-mode deploy
+            -DskipTests=true
+            -Dgpg.passphrase=$GPG_PASSPHRASE
+            -Dossrh.username=$OSSRH_USERNAME
+            -Dossrh.password=$OSSRH_PASSWORD
+            -P maven-central
+
+workflows:
+  version: 2
+  ci-build:
+    jobs:
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              ignore:
+                - master
+                - releases/*.*.x
+
+  snapshot:
+    jobs:
+      - build-and-deploy-snapshot:
+          filters:
+            branches:
+              only:
+                - master
+                - releases/*.*.x
+  release:
+    jobs:
+      - build-and-deploy-release:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
