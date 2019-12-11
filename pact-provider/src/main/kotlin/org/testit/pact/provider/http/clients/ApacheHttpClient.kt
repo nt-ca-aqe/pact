@@ -48,7 +48,7 @@ class ApacheHttpClient(
 
         private fun HttpRequestBase.addHeaders(request: Request) {
             request.headers?.forEach { (name, value) ->
-                this.addHeader(name, value)
+                this.addHeader(name, value.joinToString(separator = ","))
             }
         }
 
@@ -61,7 +61,7 @@ class ApacheHttpClient(
 
                 val contentType: ContentType = determineContentType(request)
                 val body = request.body!!.value!!
-                this.entity = StringEntity(body, contentType)
+                this.entity = StringEntity(String(body), contentType)
                 this.setHeader(entity.contentType)
             }
 
@@ -81,7 +81,7 @@ class ApacheHttpClient(
 
         fun extract(response: HttpResponse): MatchableResponse {
             val status: Int = response.statusLine.statusCode
-            val headers: Map<String, String> = response.allHeaders.associate { header -> header.name to header.value }
+            val headers: Map<String, List<String>> = response.allHeaders.associate { header -> header.name to listOf(header.value) }
             val body: String? = response.entity?.let {
                 val charset = it.contentType
                         ?.let { ContentType.parse(it.value)?.charset }

@@ -10,7 +10,7 @@ import au.com.dius.pact.model.v3.messaging.Message
 class MessageMatcher {
 
     fun match(expectedMessage: Message, actualMessage: ActualMessage): Result {
-        val actualBody = actualMessage.body.let { String(it) }
+        val actualBody = String(actualMessage.body)
         val bodyMismatches = executeComparison(expectedMessage, actualBody)
         return Result(
                 bodyErrors = findBodyErrors(bodyMismatches)
@@ -20,8 +20,7 @@ class MessageMatcher {
     private fun findBodyErrors(mismatches: List<Mismatch>): List<String> = bodyMismatches(mismatches)
             .map { "[${it.path}] was expected to be [${it.expected}] but was actually [${it.actual}]" }
 
-    private fun bodyMismatches(mismatches: List<Mismatch>) = mismatches.filter { it is BodyMismatch }
-            .map { it as BodyMismatch }
+    private fun bodyMismatches(mismatches: List<Mismatch>) = mismatches.filterIsInstance<BodyMismatch>()
             .groupBy { it.path }
             .map { it.value.first() }
             .sortedBy { it.path }
@@ -44,11 +43,11 @@ class MessageMatcher {
     }
 
     private fun executeComparison(message: Message, actualBody: String): List<Mismatch> {
-        val contentType = message.contentType
+        val contentType = message.contentType.substringBefore(";")
         val matcher = MatchingConfig.lookupBodyMatcher(contentType)
                 ?: error("Content-Type [$contentType] is currently not supported!")
         val expected = message.asPactRequest()
-        val actual = Response(200, emptyMap(), OptionalBody.body(actualBody))
+        val actual = Response(200, emptyMap(), OptionalBody.body(actualBody.toByteArray()))
         return matcher.matchBody(expected, actual, true)
     }
 

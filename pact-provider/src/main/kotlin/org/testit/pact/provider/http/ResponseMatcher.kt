@@ -37,20 +37,13 @@ class ResponseMatcher {
                 .map { "[${it.path}] was expected to be [${it.expected}] but was actually [${it.actual}]" }
     }
 
-    private fun statusMismatch(mismatches: List<Mismatch>) = mismatches.filter { it is StatusMismatch }
-            .map { it as StatusMismatch }
-            .singleOrNull()
+    private fun statusMismatch(mismatches: List<Mismatch>) = mismatches.filterIsInstance<StatusMismatch>().singleOrNull()
 
-    private fun headerMismatches(mismatches: List<Mismatch>) = mismatches.filter { it is HeaderMismatch }
-            .map { it as HeaderMismatch }
-            .sortedBy { it.headerKey }
+    private fun headerMismatches(mismatches: List<Mismatch>) = mismatches.filterIsInstance<HeaderMismatch>().sortedBy { it.headerKey }
 
-    private fun bodyTypeMismatch(mismatches: List<Mismatch>) = mismatches.filter { it is BodyTypeMismatch }
-            .map { it as BodyTypeMismatch }
-            .singleOrNull()
+    private fun bodyTypeMismatch(mismatches: List<Mismatch>) = mismatches.filterIsInstance<BodyTypeMismatch>().singleOrNull()
 
-    private fun bodyMismatches(mismatches: List<Mismatch>) = mismatches.filter { it is BodyMismatch }
-            .map { it as BodyMismatch }
+    private fun bodyMismatches(mismatches: List<Mismatch>) = mismatches.filterIsInstance<BodyMismatch>()
             .groupBy { it.path }
             .map { it.value.first() }
             .sortedBy { it.path }
@@ -80,10 +73,18 @@ class ResponseMatcher {
 
     }
 
-    private fun executeComparison(response: Response, actualStatus: Int, actualHeaders: Map<String, String>, actualBody: String?): List<Mismatch> {
+    private fun executeComparison(response: Response, actualStatus: Int, actualHeaders: Map<String, List<String>>, actualBody: String?):
+        List<Mismatch> {
         val matching = `ResponseMatching$`.`MODULE$`
         return seqAsJavaListConverter(
-                matching.responseMismatches(response, Response(actualStatus, actualHeaders, OptionalBody.body(actualBody)))
+                matching.responseMismatches(
+                    response,
+                    Response(
+                        actualStatus,
+                        actualHeaders,
+                        OptionalBody.body(actualBody?.toByteArray())
+                    )
+                )
         ).asJava()
     }
 
