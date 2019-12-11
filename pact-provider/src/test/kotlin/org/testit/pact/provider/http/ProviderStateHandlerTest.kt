@@ -80,7 +80,7 @@ internal class ProviderStateHandlerTest {
     }
 
     @Test fun `malformed state methods throw exception - wrong argument type`() {
-        val cut = ProviderStateHandler(MallformedCallbackHandler())
+        val cut = ProviderStateHandler(MalformedCallbackHandler())
         val interaction = interaction("malformed state", listOf(
                 providerState("non map method argument")
         ))
@@ -90,7 +90,7 @@ internal class ProviderStateHandlerTest {
     }
 
     @Test fun `malformed state methods throw exception - number of arguments`() {
-        val cut = ProviderStateHandler(MallformedCallbackHandler())
+        val cut = ProviderStateHandler(MalformedCallbackHandler())
         val interaction = interaction("malformed state", listOf(
                 providerState("more than one method argument")
         ))
@@ -111,7 +111,7 @@ internal class ProviderStateHandlerTest {
 
     }
 
-    class MallformedCallbackHandler {
+    class MalformedCallbackHandler {
 
         @ProviderState("non map method argument")
         fun someState(arg0: String) {

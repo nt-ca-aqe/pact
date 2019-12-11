@@ -28,9 +28,7 @@ class MessagePacts(
     }
 
     private fun loadMessagePacts(providerFilter: String, consumerFilter: String?): List<MessagePact> {
-        val pacts = pactSource.loadPacts(providerFilter, consumerFilter)
-                .filter { it is MessagePact }
-                .map { it as MessagePact }
+        val pacts  = pactSource.loadPacts(providerFilter, consumerFilter).filterIsInstance<MessagePact>()
         log.debug { "loaded ${pacts.size} message pacts from [$pactSource] for providerFilter=$providerFilter and consumerFilter=$consumerFilter" }
         if (pacts.isEmpty()) {
             throw NoMessagePactsFoundException(pactSource, provider, consumerFilter)

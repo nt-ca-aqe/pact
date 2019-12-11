@@ -72,7 +72,10 @@ class ApacheRequestBuilderTest {
 
         @Test fun `headers are correctly set`() {
             val pactRequest = pactRequest {
-                headers = mapOf("Content-Type" to "application/json", "X-Correlation-Id" to "foo-bar-123")
+                headers = mapOf(
+                    "Content-Type" to listOf("application/json"),
+                    "X-Correlation-Id" to listOf("foo-bar-123")
+                )
             }
 
             with(ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest)) {
@@ -95,8 +98,8 @@ class ApacheRequestBuilderTest {
         @Test fun `content type of header is used if available even though it might be wrong`() {
             val pactRequest = pactRequest {
                 method = "POST"
-                headers = mapOf("Content-Type" to "application/json")
-                body = OptionalBody.body("<foo><bar>Hello World</bar></foo>")
+                headers = mapOf("Content-Type" to listOf("application/json"))
+                body = OptionalBody.body("<foo><bar>Hello World</bar></foo>".toByteArray())
             }
 
             with(ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest) as HttpPost) {
@@ -110,7 +113,7 @@ class ApacheRequestBuilderTest {
             val pactRequest = pactRequest {
                 method = "POST"
                 headers = mapOf()
-                body = OptionalBody.body("""{ "foo": "bar" }""")
+                body = OptionalBody.body("""{ "foo": "bar" }""".toByteArray())
             }
 
             with(ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest) as HttpPost) {
@@ -124,7 +127,7 @@ class ApacheRequestBuilderTest {
             val pactRequest = pactRequest {
                 method = "POST"
                 headers = mapOf()
-                body = OptionalBody.body("<foo><bar>Hello World</bar></foo>")
+                body = OptionalBody.body("<foo><bar>Hello World</bar></foo>".toByteArray())
             }
 
             with(ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest) as HttpPost) {
@@ -138,7 +141,7 @@ class ApacheRequestBuilderTest {
             val pactRequest = pactRequest {
                 method = "POST"
                 headers = mapOf()
-                body = OptionalBody.body("foo = bar")
+                body = OptionalBody.body("foo = bar".toByteArray())
             }
 
             with(ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest) as HttpPost) {
@@ -152,7 +155,7 @@ class ApacheRequestBuilderTest {
             val pactRequest = pactRequest {
                 method = "HEAD"
                 headers = mapOf()
-                body = OptionalBody.body("foo = bar")
+                body = OptionalBody.body("foo = bar".toByteArray())
             }
             val exception = assertThrows<IllegalStateException> {
                 ApacheHttpClient.RequestBuilder.build(defaultUri, pactRequest)

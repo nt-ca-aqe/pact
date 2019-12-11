@@ -29,8 +29,8 @@ class ApacheResponseExtractorTest {
         }
         val result = ApacheHttpClient.ResponseExtractor.extract(response)
         Assertions.assertThat(result.headers).isEqualTo(mapOf(
-                "Content-Type" to "application/json",
-                "X-Correlation-Id" to "foo-bar-123"
+                "Content-Type" to listOf("application/json"),
+                "X-Correlation-Id" to listOf("foo-bar-123")
         ))
     }
 
